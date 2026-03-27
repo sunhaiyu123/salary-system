@@ -60,7 +60,7 @@ npx serve .
 DB_HOST=localhost
 DB_PORT=3306
 DB_USER=root
-DB_PASSWORD=Gczx2018@3
+DB_PASSWORD=gxsfasdf
 DB_DATABASE=a8v5
 PORT=3000
 ```
