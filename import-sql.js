@@ -4,7 +4,7 @@ const { exec } = require('child_process');
 console.log('开始导入 SQL 文件...');
 
 const sqlFile = 'D:\\a8v5_backup_20260312_222256.sql';
-const mysqlCmd = 'mysql -h 127.0.0.1 -u root -p"Gczx2018@3" a8v5';
+const mysqlCmd = 'mysql -h 127.0.0.1 -u root -p"gxsfasdf" a8v5';
 
 const readStream = createReadStream(sqlFile);
 const mysqlProcess = exec(mysqlCmd, { maxBuffer: 1024 * 1024 * 1024 }); // 1GB buffer
