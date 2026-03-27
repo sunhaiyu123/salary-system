@@ -39,7 +39,7 @@ ADD INDEX idx_id (ID);
 
 ```bash
 # 1. 登录 MySQL
-mysql -u root -pGczx2018@3 a8v5
+mysql -u root -pgxsfasdf a8v5
 
 # 2. 导入优化脚本
 source C:/Users/sunhaiyu/.openclaw/workspace/salary-system/optimize-indexes.sql
@@ -48,7 +48,7 @@ source C:/Users/sunhaiyu/.openclaw/workspace/salary-system/optimize-indexes.sql
 或在命令行直接执行：
 
 ```bash
-mysql -u root -pGczx2018@3 a8v5 < optimize-indexes.sql
+mysql -u root -pgxsfasdf a8v5 < optimize-indexes.sql
 ```
 
 ### 第二步：重启 API 服务
