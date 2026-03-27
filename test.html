@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试 API 连接</title>
+    <style>
+        body { font-family: Arial; padding: 20px; background: #f5f5f5; }
+        .box { background: white; padding: 20px; border-radius: 10px; max-width: 600px; margin: 0 auto; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #667eea; }
+        button { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 16px; margin: 10px 5px; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4); }
+        #result { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; white-space: pre-wrap; font-family: monospace; font-size: 12px; max-height: 400px; overflow-y: auto; }
+        .loading { color: #667eea; }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>🧪 API 连接测试</h1>
+        <p>点击按钮测试 API 是否正常工作：</p>
+        
+        <button onclick="testHealth()">1️⃣ 测试服务器状态</button>
+        <button onclick="testQuery('孙海宇', '2024', '12')">2️⃣ 查询孙海宇 2024-12</button>
+        <button onclick="testQuery('孙海宇', '2025', '01')">3️⃣ 查询孙海宇 2025-01</button>
+        <button onclick="testQuery('孙海宇', '2025', '02')">4️⃣ 查询孙海宇 2025-02</button>
+        
+        <div id="result">等待测试...</div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api';
+        const resultDiv = document.getElementById('result');
+
+        function showResult(message, type = 'normal') {
+            resultDiv.className = type;
+            resultDiv.textContent = message;
+        }
+
+        async function testHealth() {
+            showResult('正在测试服务器状态...', 'loading');
+            try {
+                const response = await fetch(`${API_URL}/health`);
+                const data = await response.json();
+                showResult(`✅ 服务器状态正常!\n\n${JSON.stringify(data, null, 2)}`, 'success');
+            } catch (error) {
+                showResult(`❌ 连接失败:\n${error.message}\n\n请确保 Node.js API 服务已启动 (npm start)`, 'error');
+            }
+        }
+
+        async function testQuery(name, year, month) {
+            showResult(`正在查询 ${name} - ${year}-${month}...`, 'loading');
+            try {
+                const response = await fetch(
+                    `${API_URL}/salary?name=${encodeURIComponent(name)}&year=${year}&month=${month}`
+                );
+                const data = await response.json();
+                
+                if (data.success) {
+                    showResult(`✅ 查询成功! 找到 ${data.data.categories.length} 个分类\n\n${JSON.stringify(data.data, null, 2)}`, 'success');
+                } else {
+                    showResult(`⚠️ ${data.message}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ 请求失败:\n${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载自动测试服务器状态
+        window.onload = () => {
+            setTimeout(testHealth, 500);
+        };
+    </script>
+</body>
+</html>

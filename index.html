@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📊 薪资查询系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .search-form {
+            padding: 30px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-search {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-search:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            padding: 30px;
+        }
+
+        /* 🔥 年薪信息卡片样式 */
+        .annual-salary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            color: white;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .annual-salary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .annual-salary-title {
+            font-size: 18px;
+            font-weight: bold;
+            opacity: 0.95;
+        }
+
+        .annual-salary-info {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+        }
+
+        .annual-salary-amount {
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .annual-salary-currency {
+            font-size: 24px;
+            opacity: 0.9;
+        }
+
+        .annual-salary-months {
+            margin-left: auto;
+            background: rgba(255,255,255,0.2);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .annual-salary-note {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f1f3f5;
+        }
+
+        .result-header h2 {
+            color: #2d3436;
+            font-size: 20px;
+        }
+
+        .result-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .info-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .salary-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .salary-card h3 {
+            color: #667eea;
+            font-size: 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items-center;
+            gap: 8px;
+        }
+
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .salary-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+        }
+
+        .salary-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .salary-table tr:hover {
+            background-color: rgba(102, 126, 234, 0.05);
+        }
+
+        .amount-cell {
+            text-align: right;
+            font-family: 'Consolas', monospace;
+            font-weight: 600;
+            color: #2d3436;
+        }
+
+        .total-row td {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            font-weight: 700;
+        }
+
+        .total-row .amount-cell {
+            color: #667eea;
+            font-size: 18px;
+        }
+
+        .highlight-row td {
+            background-color: rgba(255, 193, 7, 0.1);
+            position: relative;
+        }
+
+        .highlight-row td::before {
+            content: '★';
+            position: absolute;
+            left: -20px;
+            color: #ffc107;
+        }
+
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+        }
+
+        .summary-card .label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .summary-card .value {
+            font-size: 24px;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #adb5bd;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-msg {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 20px;
+        }
+
+        .server-status {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        /* 登录页面样式 */
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .login-box h2 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .login-box p {
+            color: #adb5bd;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .login-box input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .login-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-error {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .main-content {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 登录遮罩层 -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h2>🔐 薪资系统访问</h2>
+            <p>请输入密码以继续</p>
+            <div class="login-error" id="loginError">❌ 密码错误，请重试</div>
+            <input type="password" id="passwordInput" placeholder="请输入密码" autocomplete="off">
+            <button class="btn-login" onclick="checkPassword()">🚀 进入系统</button>
+        </div>
+    </div>
+
+    <!-- 主内容区 -->
+    <div class="container" id="mainContent" style="display: none;">
+        <div class="header">
+            <h1>📊 薪资查询系统</h1>
+            <p>真实数据库连接 · 自动系数计算 · 精确到月份</p>
+        </div>
+
+        <div class="search-form">
+            <div id="serverStatus" class="server-status" style="display: none;">
+                🟢 服务器运行正常
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="nameInput">👤 姓名</label>
+                    <input type="text" id="nameInput" placeholder="请输入姓名，例如：鱼钳壹号" value="">
+                </div>
+                <div class="form-group">
+                    <label for="yearSelect">📅 年份</label>
+                    <select id="yearSelect">
+                        <option value="">请选择年份</option>
+                        <option value="2029">2029</option>
+                        <option value="2028">2028</option>
+                        <option value="2027">2027</option>
+                        <option value="2026">2026</option>
+                        <option value="2025" selected>2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="monthSelect">📆 月份</label>
+                    <select id="monthSelect">
+                        <option value="01">1 月</option>
+                        <option value="02">2 月</option>
+                        <option value="03" selected>3 月</option>
+                        <option value="04">4 月</option>
+                        <option value="05">5 月</option>
+                        <option value="06">6 月</option>
+                        <option value="07">7 月</option>
+                        <option value="08">8 月</option>
+                        <option value="09">9 月</option>
+                        <option value="10">10 月</option>
+                        <option value="11">11 月</option>
+                        <option value="12">12 月</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-search" onclick="searchSalary()">🔍 查询薪资</button>
+        </div>
+
+        <div class="result-container" id="resultContainer">
+            <div class="empty-state">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <p>请在上方输入姓名和年月，点击查询查看薪资明细</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 密码验证
+        const CORRECT_PASSWORD = 'Gczx@sunhy123';
+
+        // 验证密码
+        function checkPassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const loginError = document.getElementById('loginError');
+            
+            if (passwordInput.value === CORRECT_PASSWORD) {
+                // 登录成功，显示主内容并检查服务器状态
+                document.getElementById('loginOverlay').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                checkServerStatus(); // 登录后立即检查服务器状态
+            } else {
+                loginError.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+                
+                // 震动效果
+                const loginBox = document.querySelector('.login-box');
+                loginBox.animate([
+                    { transform: 'translateX(-10px)' },
+                    { transform: 'translateX(10px)' },
+                    { transform: 'translateX(0)' }
+                ], { duration: 300 });
+            }
+        }
+
+        // 支持回车登录
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // 页面加载时自动聚焦密码框
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                const passwordInput = document.getElementById('passwordInput');
+                if (passwordInput) passwordInput.focus();
+            }, 100);
+        });
+
+        // API 服务器地址
+        const API_BASE_URL = 'http://localhost:3001/api';
+
+        function formatMoney(amount) {
+            if (!amount && amount !== 0) return '-';
+            return '¥' + amount.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function getMonthName(monthNum) {
+            const monthNames = ['1 月', '2 月', '3 月', '4 月', '5 月', '6 月', 
+                               '7 月', '8 月', '9 月', '10 月', '11 月', '12 月'];
+            return monthNames[parseInt(monthNum) - 1] || monthNum;
+        }
+
+        // 检查服务器状态
+        async function checkServerStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    document.getElementById('serverStatus').style.display = 'block';
+                    document.getElementById('serverStatus').innerHTML = '🟢 服务器运行正常';
+                }
+            } catch (error) {
+                console.log('服务器连接失败:', error.message);
+            }
+        }
+
+        async function searchSalary() {
+            const name = document.getElementById('nameInput').value.trim();
+            const year = document.getElementById('yearSelect').value;
+            const month = document.getElementById('monthSelect').value;
+            const resultContainer = document.getElementById('resultContainer');
+
+            if (!name) {
+                resultContainer.innerHTML = '<div class="error-msg">⚠️ 请输入姓名！</div>';
+                return;
+            }
+
+            // 显示加载状态
+            resultContainer.innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>正在连接数据库查询 ${name} 的薪资数据...</p>
+                </div>
+            `;
+
+            try {
+                // 调用真实 API
+                const response = await fetch(
+                    `${API_BASE_URL}/salary?name=${encodeURIComponent(name)}&year=${year}&month=${month}`
+                );
+                
+                const result = await response.json();
+
+                if (!result.success) {
+                    throw new Error(result.message || '查询失败');
+                }
+
+                const salaryData = result.data.categories;
+
+                if (!salaryData || salaryData.length === 0) {
+                    throw new Error(`未找到 ${name} 在 ${year}年${getMonthName(month)}的薪资数据`);
+                }
+
+                // 计算汇总数据
+                const summary = calculateSummary(salaryData);
+
+                // 🔥 等待年薪统计数据返回后再渲染（避免被 innerHTML 覆盖）
+                try {
+                    const annualResponse = await fetch(`${API_BASE_URL}/annual-salary?name=${encodeURIComponent(name)}&year=${year}`);
+                    const annualResult = await annualResponse.json();
+                    const annualData = annualResult.success ? annualResult.data : null;
+
+                    // 渲染结果（包含年薪卡片）
+                    resultContainer.innerHTML = `
+                        <div class="result-header">
+                            <h2>👤 ${name} 的薪资明细</h2>
+                            <div class="result-info">
+                                <span class="info-badge">${year}年${getMonthName(month)}</span>
+                                <span class="info-badge">真实数据 ✅</span>
+                            </div>
+                        </div>
+
+                        ${annualData ? renderAnnualSalaryCard(annualData) : ''}
+
+                        ${renderSummaryCards(summary)}
+
+                        ${salaryData.map(category => renderCategoryCard(category)).join('')}
+                    `;
+                } catch (error) {
+                    console.log('年薪查询失败:', error);
+                    // 年薪查询失败时也渲染月度数据
+                    resultContainer.innerHTML = `
+                        <div class="result-header">
+                            <h2>👤 ${name} 的薪资明细</h2>
+                            <div class="result-info">
+                                <span class="info-badge">${year}年${getMonthName(month)}</span>
+                                <span class="info-badge">真实数据 ✅</span>
+                            </div>
+                        </div>
+
+                        ${renderSummaryCards(summary)}
+
+                        ${salaryData.map(category => renderCategoryCard(category)).join('')}
+                    `;
+                }
+
+            } catch (error) {
+                resultContainer.innerHTML = `
+                    <div class="error-msg">
+                        ❌ ${error.message}
+                        <br><br>
+                        <small>请确保：<br>
+                        1. Node.js API 服务已启动 (npm start)<br>
+                        2. MySQL 数据库连接正常<br>
+                        3. 输入信息正确</small>
+                    </div>
+                `;
+            }
+        }
+
+        function calculateSummary(data) {
+            let wageSubtotal = 0;       // 工资小计
+            let totalPayable = 0;       // 应发合计
+            let netPay = 0;             // 入卡金额
+
+            data.forEach(category => {
+                if (!category.items) return;
+                
+                category.items.forEach(item => {
+                    if (!item.amount) return;
+                    
+                    // 累加同名项的金额（卡片汇总显示总计）
+                    if (item.name === '工资小计') {
+                        wageSubtotal += item.amount;
+                    } else if (item.name === '应发合计') {
+                        totalPayable += item.amount;
+                    } else if (item.name === '入卡金额') {
+                        netPay += item.amount;
+                    }
+                });
+            });
+
+            return { wageSubtotal, totalPayable, netPay };
+        }
+
+        // 🔥 渲染年薪统计卡片（返回 HTML 字符串）
+        function renderAnnualSalaryCard(data) {
+            return `
+                <div class="annual-salary-card">
+                    <div class="annual-salary-header">
+                        <div class="annual-salary-title">💰 全年应发合计</div>
+                        <div class="annual-salary-info">
+                            <span class="annual-salary-amount">${data.annualTotal.toLocaleString('zh-CN', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span>
+                            <span class="annual-salary-currency">元</span>
+                            ${data.monthsWithData ? `<div class="annual-salary-months">${data.monthsWithData}个月有数据</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="annual-salary-note">📊 统计：${data.year}年全年（12 个月应发合计累加）</div>
+                </div>
+            `;
+        }
+
+        function renderSummaryCards(summary) {
+            return `
+                <div class="summary-cards">
+                    <div class="summary-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="label">💰 工资小计</div>
+                        <div class="value">${formatMoney(summary.wageSubtotal)}</div>
+                    </div>
+                    <div class="summary-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="label">📊 应发合计</div>
+                        <div class="value">${formatMoney(summary.totalPayable)}</div>
+                    </div>
+                    <div class="summary-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="label">💵 入卡金额</div>
+                        <div class="value">${formatMoney(summary.netPay)}</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCategoryCard(category) {
+            const emojiMap = {
+                '工资构成': '💰',
+                '福利': '🎁',
+                '个人缴纳': '📝',
+                '其他信息': 'ℹ️',
+                '应发合计': '📊'
+            };
+
+            return `
+                <div class="salary-card">
+                    <h3>${emojiMap[category.category] || ''} ${category.category}</h3>
+                    <table class="salary-table">
+                        <tbody>
+                            ${category.items.map(item => `
+                                <tr class="${item.isTotal ? 'total-row' : (item.highlight ? 'highlight-row' : '')}">
+                                    <td>${item.name}</td>
+                                    <td class="amount-cell">${formatMoney(item.amount)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        // 支持回车搜索
+        document.getElementById('nameInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchSalary();
+            }
+        });
+
+
+    </script>
+</body>
+</html>
