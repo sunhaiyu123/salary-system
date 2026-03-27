@@ -8,7 +8,7 @@ console.log('💾 目标：localhost/a8v5');
 const mysql = spawn('mysql', [
     '-h', '127.0.0.1',
     '-u', 'root',
-    '-pGczx2018@3',
+    '-pgxsfasdf',
     'a8v5'
 ]);
 
